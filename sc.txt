@@ -1,0 +1,1 @@
+Scaffold-DbContext "Data Source=localhost\SQLEXPRESS01;Initial Catalog=final;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir Contexts -Context ShoeShopDbContext -Tables Category, Maker, Order, Role, Shoe, ShoeShop, User, Vendor

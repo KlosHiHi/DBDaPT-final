@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ShoeShopLibrary/ShoeShopLibrary.csproj" />
+  <Project Path="WebApi/WebApi.csproj" />
+  <Project Path="WebApp/WebApp.csproj" />
+  <Project Path="WpfApp/WpfApp.csproj" />
+</Solution>
