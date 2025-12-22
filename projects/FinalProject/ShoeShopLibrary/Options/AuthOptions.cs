@@ -1,5 +1,8 @@
 ﻿namespace ShoeShopLibrary.Options
 {
+    /// <summary>
+    /// Свойства для авторизации по jwt ключу
+    /// </summary>
     public static class AuthOptions
     {
         public static readonly string secretKey = "12345678123456781234567812345678";

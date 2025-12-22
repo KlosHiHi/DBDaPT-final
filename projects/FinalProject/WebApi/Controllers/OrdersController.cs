@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoeShopLibrary.Contexts;
 using ShoeShopLibrary.Models;
@@ -11,40 +12,56 @@ namespace WebApi.Controllers
     {
         private readonly ShoeShopDbContext _context = context;
 
-        // GET: api/Orders
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
-            => await _context.Orders.ToListAsync();
-
         // GET: api/Orders/login
-        [HttpGet("{login}")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByLogin([FromQuery] string login)
+        [Authorize] // Атрибут, дающий доступ лишь авторизированным пользователям
+        [HttpGet("{login}")] // Метод Get, получающий заказы пользователя по логину
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByLogin(string login)
         {
-            return await _context.Orders
+            var orders = await _context.Orders
                 .Include(o => o.User)
-                .Where(o => o.User.Login == login)
+                .Where(o => o.User.Login == login) 
                 .ToListAsync() ?? null!;
+
+            return orders is null ?
+                NotFound() :
+                Ok(orders);
         }
 
-        // GET: api/Orders/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
+        // POST: api/Orders/5/date
+        [Authorize(Roles = "admin, manager")] // Атрибут, дающий доступ к методу только пользователям с ролью admin и manager
+        [HttpPut("{id}/date")] // Метод Put с изменением даты по id
+        public async Task<ActionResult<Order>> PutOrderDate(int id, [FromQuery] DateOnly date)
+        {
+            var order = await _context.Orders.FindAsync(id); // поиск заказа по id
+
+            if (order is null)
+                return NotFound();
+
+            order.OrderDate = date;
+
+            try
+            {
+                await _context.SaveChangesAsync(); // Сохранение изменений в контексте
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/Orders/5/status
+        [Authorize(Roles = "admin, manager")]
+        [HttpPut("{id}/status")] // Метод Put с измененим статуса заказа
+        public async Task<ActionResult<Order>> PutOrderStatus(int id, [FromQuery] bool status)
         {
             var order = await _context.Orders.FindAsync(id);
 
-            return order is null ?
-                 NotFound() :
-                 Ok(order);
-        }
+            if (order is null)
+                return NotFound();
 
-        // PUT: api/Orders/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
-        {
-            if (id != order.OrderId)
-                return BadRequest();
-
-            _context.Entry(order).State = EntityState.Modified;
+            order.IsFinished = status;
 
             try
             {
@@ -52,42 +69,10 @@ namespace WebApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await OrderExists(id))
-                    return NotFound();
-                else
-                    throw;
+                return BadRequest();
             }
 
             return NoContent();
-        }
-
-        // POST: api/Orders
-        [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
-        {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetOrder", new { id = order.OrderId }, order);
-        }
-
-        // DELETE: api/Orders/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-            if (order is null)
-                return NotFound();
-
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private async Task<bool> OrderExists(int id)
-        {
-            return await _context.Orders.AnyAsync(e => e.OrderId == id);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShoeShopLibrary.Contexts;
 using ShoeShopLibrary.Models;
@@ -12,15 +13,17 @@ namespace WebApi.Controllers
         private readonly ShoeShopDbContext _context = context;
 
         // GET: api/Shoes
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet] 
         public async Task<ActionResult<IEnumerable<Shoe>>> GetShoes()
-            => await _context.Shoes.ToListAsync();
+            => await _context.Shoes.ToListAsync(); //Метод Get на получение всех товаров из БД
 
-        // GET: api/Shoes/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Shoe>> GetShoe(int id)
+        // GET: api/Shoes/А112Т4
+        [AllowAnonymous]
+        [HttpGet("{article}")] // Метод Get на получение товара по артикулу
+        public async Task<ActionResult<Shoe>> GetShoe(string article)
         {
-            var shoe = await _context.Shoes.FindAsync(id);
+            var shoe = await _context.Shoes.FirstOrDefaultAsync(s => s.Article == article);
 
             return shoe is null ?
                 NotFound() :
@@ -28,7 +31,8 @@ namespace WebApi.Controllers
         }
 
         // PUT: api/Shoes/5
-        [HttpPut("{id}")]
+        [Authorize(Roles = "admin, manager")] // метод доступен только пользователям с ролью admin и manager
+        [HttpPut("{id}")] //изменение товара по id
         public async Task<IActionResult> PutShoe(int id, Shoe shoe)
         {
             if (id != shoe.ShoeId)
@@ -54,16 +58,18 @@ namespace WebApi.Controllers
         }
 
         // POST: api/Shoes
+        [Authorize(Roles = "admin, manager")]
         [HttpPost]
         public async Task<ActionResult<Shoe>> PostShoe(Shoe shoe)
         {
             _context.Shoes.Add(shoe);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetShoe", new { id = shoe.ShoeId }, shoe);
+            return CreatedAtAction(nameof(GetShoe), new { id = shoe.ShoeId }, shoe);
         }
 
         // DELETE: api/Shoes/5
+        [Authorize(Roles = "admin, manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteShoe(int id)
         {

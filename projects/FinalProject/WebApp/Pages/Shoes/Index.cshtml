@@ -1,0 +1,108 @@
+﻿@page
+@model WebApp.Pages.Shoes.IndexModel
+
+@{
+    ViewData["Title"] = "Товары";
+}
+
+<form method="get">
+    <input type="text"
+           name="shoeDescription"
+           value="@Model.ShoeDescription"
+           placeholder="поиск..."
+           onchange="this.form.submit()"
+           class="form-control" />
+
+    <select class="form-control" 
+            asp-items="ViewBag.Makers"
+            asp-for="Maker"
+            name="maker"
+            onchange="this.form.submit()">
+        <option>
+            Все
+        </option>
+    </select>
+
+    <input type="number"
+           name="maxPrice"
+           value="@Model.MaxPrice"
+           placeholder="максимальная цена..."
+           onchange="this.form.submit()"
+           class="form-control" />
+
+    Со скидкой <input type="checkbox"
+           name="isInStock"
+           value="@Model.IsInStock"
+           onchange="this.form.submit()"
+           class="form-check-input"/>
+
+    В наличии <input type="checkbox"
+           name="isDiscount"
+           value="@Model.IsDiscount"
+           onchange="this.form.submit()"
+           class="form-check-input" />
+
+    <select class="form-control"
+            onchange="this.form.submit()"
+            name="sortColumn">
+        <option value="name" selected="@(Model.SortColumn == "name")">
+            По названию
+        </option>
+        <option value="vendor" selected="@(Model.SortColumn == "vendor")">
+            По поставщику
+        </option>
+        <option value="price" selected="@(Model.SortColumn == "price")">
+            По цене (дешевые)
+        </option>
+        <option value="price_desc" selected="@(Model.SortColumn == "price_desc")">
+            По цене (дорогие)
+        </option>
+    </select>
+</form>
+
+@foreach (var item in Model.Shoe) {
+    <div class="container">
+        <div class="card" style="width:100%; margin:10px">
+        <div class="row" style="display: flex; justify-content: center; align-items: center;">
+            <div class="col text-center">
+                @if(String.IsNullOrEmpty(item.PhotoName))
+                {
+                    <img src="~/img/picture.png" height="100" width="120"/>
+                }
+                else
+                {
+                    <img src="~/img/@Html.DisplayFor(modelItem => item.PhotoName)" height="100" width="120" />
+                }
+            </div>
+            <div class="col">
+                <b>@Html.DisplayFor(modelItem => item.Gender) |
+                    @Html.DisplayFor(modelItem => item.Category.Name)</b><br />
+
+                Описание товара: @Html.DisplayFor(modelItem => item.Description)<br />
+                Производитель: @Html.DisplayFor(modelItem => item.Maker.Name)<br />
+                Поставщик: @Html.DisplayFor(modelItem => item.Vendor.Name)<br />
+                                
+                @if(item.Discount != 0)
+                {
+                    <text>Цена <s>@Html.DisplayFor(modelItem => item.Price)</s>
+                        @Html.DisplayFor(modelItem => item.DiscountPrice)<br /></text>
+                }
+                else
+                {
+                    <text>Цена: @Html.DisplayFor(modelItem => item.Price)</text><br />                    
+                }
+                
+                Количество на складе: @Html.DisplayFor(modelItem => item.Quantity)
+            </div>                
+            <div class="col">
+                    <div class="card opacity-100" style="background:@(item.Discount < 15 ? "white" : "#00FA9A");width:50%;justify-content:center;align-items:center">
+                        <p>скидка</p> <p style="font-size:50px;align-items:center">@Html.DisplayFor(modelItem => item.Discount)</p>
+                    <form>
+                        <input type="submit" class="btn btn-primary" value="Заказать" style="width:100%;background:#00FA9A" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+}
