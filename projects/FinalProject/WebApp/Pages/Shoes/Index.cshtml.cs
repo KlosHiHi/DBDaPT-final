@@ -13,7 +13,6 @@ namespace WebApp.Pages.Shoes
         private DateOnly _todayDate = DateOnly.FromDateTime(DateTime.Now);
         private DateOnly _nextWeekDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7));
 
-
         public IndexModel(ShoeShopLibrary.Contexts.ShoeShopDbContext context)
         {
             _context = context;
@@ -55,15 +54,19 @@ namespace WebApp.Pages.Shoes
         [BindProperty]
         public int SelectedShoeId { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string Message { get; set; } = "По вашему запросу ничего не найдено";
+
         public async Task<IActionResult> OnPostGuestOrderAsync()
         {
             return RedirectToPage("/Login");
         }
 
+
         public async Task<IActionResult> OnPostClientOrderAsync()
         {
-            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
-        
+            var userId = int.Parse(HttpContext.Session.GetString("UserId")); // Получение id пользователя из сессии
+
             Order newOrder = new()
             {
                 UserId = userId,
@@ -71,23 +74,32 @@ namespace WebApp.Pages.Shoes
                 DeliveryDate = _nextWeekDate,
                 IsFinished = false,
                 ReceiveCode = _random.Next(100, 999),
-            };
+            }; // создание обекта нового закааз
 
-            _context.Orders.Add(newOrder);
-            await _context.SaveChangesAsync();
-
-            var order = _context.Entry(newOrder);
-            var generatedId = order.Property(o => o.OrderId).CurrentValue;
-
-            ShoeOrder shoeOrder = new()
+            try
             {
-                ShoeId = SelectedShoeId,
-                OrderId = generatedId,
-                Quantity = 1
-            };
+                _context.Orders.Add(newOrder);
+                await _context.SaveChangesAsync(); // добавление и сохранения заказа
 
-            _context.ShoeOrders.Add(shoeOrder);
-            await _context.SaveChangesAsync();
+                var order = _context.Entry(newOrder);
+                var generatedId = order.Property(o => o.OrderId).CurrentValue; // получаем id вставленного заказа
+
+                ShoeOrder shoeOrder = new()
+                {
+                    ShoeId = SelectedShoeId,
+                    OrderId = generatedId,
+                    Quantity = 1
+                }; // создание записи в таблицу соединяющую заказ и заказанный товар
+
+                _context.ShoeOrders.Add(shoeOrder);
+                await _context.SaveChangesAsync(); // сохранения записи в БД
+
+                Message = "Заказ успешно создан";
+            }
+            catch (Exception ex)
+            {
+                Message = $"{ex.Message}";
+            }
 
             return RedirectToPage("/Index");
         }
@@ -105,18 +117,18 @@ namespace WebApp.Pages.Shoes
             if (!String.IsNullOrEmpty(ShoeDescription))
                 shoes = shoes
                     .Where(s => s.Description
-                    .Contains(ShoeDescription));
+                    .Contains(ShoeDescription)); //Поиск по описанию, при условии что строка чем-то заполнена
 
             if (Maker > 0)
                 shoes = shoes
-                    .Where(s => s.Maker.MakerId == Maker);
+                    .Where(s => s.Maker.MakerId == Maker); // Фильтрация по производителю
 
             if (MaxPrice > 0)
                 shoes = shoes
-                    .Where(s => s.Price <= MaxPrice);
+                    .Where(s => s.Price <= MaxPrice); // Фильтрация, на цену не превышающую указанную
 
             if (IsInStock)
-                shoes = shoes.Where(s => s.Quantity > 0);
+                shoes = shoes.Where(s => s.Quantity > 0); // 
 
             if (IsDiscount)
                 shoes = shoes.Where(s => s.Discount > 0);
@@ -129,6 +141,9 @@ namespace WebApp.Pages.Shoes
                 "price_desc" => shoes.OrderByDescending(s => s.Price),
                 _ => shoes
             };
+
+            if (shoes is null)
+                Message = "Нет товаров для отображения";
 
             Shoe = await shoes.ToListAsync();
         }

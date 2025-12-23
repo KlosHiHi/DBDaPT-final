@@ -9,30 +9,42 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Order[0].OrderId)
+                @Html.DisplayNameFor(model => model.OrderInfo[0].OrderId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Order[0].OrderDate)
+                @Html.DisplayNameFor(model => model.OrderInfo[0].User)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Order[0].User)
+                @Html.DisplayNameFor(model => model.OrderInfo[0].OrderDate)
             </th>
-            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderInfo[0].TotalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderInfo[0].ShoeArticles)
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Order) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.FirstName)
-            </td>
-        </tr>
+ @foreach (var item in Model.OrderInfo)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.User.Login)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TotalPrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ShoeArticles)
+        </td>
+    </tr>
 }
     </tbody>
 </table>

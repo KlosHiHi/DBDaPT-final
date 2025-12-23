@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ShoeShopLibrary.Contexts;
+using ShoeShopLibrary.DTOs;
 using ShoeShopLibrary.Models;
+using ShoeShopLibrary.Extensions;
 
 namespace WebApp.Pages.Orders
 {
@@ -19,12 +15,35 @@ namespace WebApp.Pages.Orders
             _context = context;
         }
 
-        public IList<Order> Order { get;set; } = default!;
+        public IList<OrderInfo> OrderInfo { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public async Task OnGetClientAsync()
         {
-            Order = await _context.Orders
-                .Include(o => o.User).ToListAsync();
+            var userOrders = _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.ShoeOrders)
+                    .ThenInclude(s => s.Shoe)
+                        .ThenInclude(s => s.Maker)
+                .Where(o => o.User.UserId == int.Parse(HttpContext.Session.GetString("UserId")))
+                .AsQueryable();
+
+            IEnumerable<Order?> orderInfos = await userOrders.ToListAsync();
+
+            OrderInfo = orderInfos.ToDtoInfos().ToList();
+        }
+
+        public async Task OnGetManagerAsync()
+        {
+            var orders = _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.ShoeOrders)
+                    .ThenInclude(s => s.Shoe)
+                        .ThenInclude(s => s.Maker)
+                .AsQueryable();
+
+            IEnumerable<Order?> orderInfos = await orders.ToListAsync();
+
+            OrderInfo = orders.ToDtoInfos().ToList();
         }
     }
 }

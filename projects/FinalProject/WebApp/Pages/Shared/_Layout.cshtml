@@ -27,7 +27,15 @@
                             <a class="nav-link text-dark" asp-area="" asp-page="/Shoes/Index">Обувь</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Orders/Index">Заказы</a>
+                            @if (Accessor.HttpContext.Session.GetString("Role") == "client")
+                            {
+                                <a class="nav-link text-dark" asp-area="" asp-page-handler="Client" asp-page="/Orders/Index">Заказы</a>
+                            }
+                            else if (Accessor.HttpContext.Session.GetString("Role") == "manager" ||
+                            Accessor.HttpContext.Session.GetString("Role") == "admin")
+                            {
+                                <a class="nav-link text-dark" asp-area="" asp-page-handler="Manager" asp-page="/Orders/Index">Заказы</a>                                
+                            }
                         </li>
                     </ul>
                 </div>

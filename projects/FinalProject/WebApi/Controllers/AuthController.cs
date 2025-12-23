@@ -6,7 +6,7 @@ using ShoeShopLibrary.Services;
 namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController] 
+    [ApiController]
     public class AuthController(AuthService service) : ControllerBase
     {
         private readonly AuthService _service = service; // объект сервиса для работы с авторизацией
@@ -17,8 +17,8 @@ namespace WebApi.Controllers
         {
             var token = await _service.AuthUserWithTokenAsync(loginRequest); // атворизация с получением токена
 
-            return token is null ? 
-                BadRequest() : 
+            return token is null ?
+                BadRequest() :
                 Ok(token); // Если токен успешно сгенерирован возвращает его, в противном случае возвращает код 400 (Ошибка запроса)
         }
     }
