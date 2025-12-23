@@ -14,7 +14,7 @@ namespace WebApi.Controllers
 
         // GET: api/Shoes
         [AllowAnonymous]
-        [HttpGet] 
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Shoe>>> GetShoes()
             => await _context.Shoes.ToListAsync(); //Метод Get на получение всех товаров из БД
 
@@ -59,7 +59,7 @@ namespace WebApi.Controllers
 
         // POST: api/Shoes
         [Authorize(Roles = "admin, manager")]
-        [HttpPost]
+        [HttpPost] // Метод на вставку новых моделей Обуви
         public async Task<ActionResult<Shoe>> PostShoe(Shoe shoe)
         {
             _context.Shoes.Add(shoe);
@@ -70,7 +70,7 @@ namespace WebApi.Controllers
 
         // DELETE: api/Shoes/5
         [Authorize(Roles = "admin, manager")]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}")] // Метод для удаления обуви по id, доступен админу и менеджеру
         public async Task<IActionResult> DeleteShoe(int id)
         {
             var shoe = await _context.Shoes.FindAsync(id);

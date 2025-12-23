@@ -1,48 +1,60 @@
 ﻿@page
 @model WebApp.Pages.Shoes.IndexModel
+@inject IHttpContextAccessor Accessor;
 
 @{
     ViewData["Title"] = "Товары";
 }
 
 <form method="get">
-    <input type="text"
-           name="shoeDescription"
-           value="@Model.ShoeDescription"
-           placeholder="поиск..."
-           onchange="this.form.submit()"
-           class="form-control" />
+    <div>
+        <div class="row">
+            <div class="col-10">
+                    <font>Поиск по описанию</font> <input type="text"
+                           name="shoeDescription"
+                           value="@Model.ShoeDescription"
+                           placeholder="поиск..."
+                           onchange="this.form.submit()"
+                           class="form-control" />
+                
+                    <font>Производитель</font> <select class="form-control" 
+                        asp-items="ViewBag.Makers"
+                        asp-for="Maker"
+                        name="maker"
+                        onchange="this.form.submit()">
+                    <option>
+                        Все
+                    </option>
+                    </select>
+                    <font>Максимальная цена</font> <input type="number"
+                       name="maxPrice"
+                       value="@Model.MaxPrice"
+                       onchange="this.form.submit()"
+                       class="form-control" />
+            </div>
 
-    <select class="form-control" 
-            asp-items="ViewBag.Makers"
-            asp-for="Maker"
-            name="maker"
-            onchange="this.form.submit()">
-        <option>
-            Все
-        </option>
-    </select>
+            <div class="col">
+                <div style="display:flex; align-items:center; justify-content: center;">
+                    <font style="font-size:30px">Со скидкой</font> <input type="checkbox"
+                    name="IsDiscount"
+                    asp-for="IsDiscount"
+                    style="margin:5px;"
+                    onchange="this.form.submit()"
+                    class="form-check-input" />
+                </div>
+                <div style="display:flex; align-items:center; justify-content: center;">
+                    <font style="font-size:30px">В наличии</font> <input type="checkbox"
+                    name="IsInStock"
+                    asp-for="IsInStock"
+                    style="margin:5px;"
+                    onchange="this.form.submit()"
+                    class="form-check-input"/>
+                </div>                      
+            </div>
+        </div>
+    </div>
 
-    <input type="number"
-           name="maxPrice"
-           value="@Model.MaxPrice"
-           placeholder="максимальная цена..."
-           onchange="this.form.submit()"
-           class="form-control" />
-
-    Со скидкой <input type="checkbox"
-           name="isInStock"
-           value="@Model.IsInStock"
-           onchange="this.form.submit()"
-           class="form-check-input"/>
-
-    В наличии <input type="checkbox"
-           name="isDiscount"
-           value="@Model.IsDiscount"
-           onchange="this.form.submit()"
-           class="form-check-input" />
-
-    <select class="form-control"
+   <select class="form-control"
             onchange="this.form.submit()"
             name="sortColumn">
         <option value="name" selected="@(Model.SortColumn == "name")">
@@ -60,6 +72,8 @@
     </select>
 </form>
 
+@if(Model?.Shoe != null && Model.Shoe.Any())
+{
 @foreach (var item in Model.Shoe) {
     <div class="container">
         <div class="card" style="width:100%; margin:10px">
@@ -97,12 +111,43 @@
             <div class="col">
                     <div class="card opacity-100" style="background:@(item.Discount < 15 ? "white" : "#00FA9A");width:50%;justify-content:center;align-items:center">
                         <p>скидка</p> <p style="font-size:50px;align-items:center">@Html.DisplayFor(modelItem => item.Discount)</p>
-                    <form>
-                        <input type="submit" class="btn btn-primary" value="Заказать" style="width:100%;background:#00FA9A" />
-                    </form>
+                    
+                        @if (Accessor.HttpContext.Session.GetString("Role") == "guest")
+                        {
+                            @if (item.Quantity == 0)
+                            {
+                                <input type="submit" disabled="disabled" class="btn btn-primary" style="background:gray" value="Нет на складе" />
+                            }
+                            else{
+                            <form method="post" asp-page-handler="GuestOrder">
+                                <input type="submit" class="btn btn-primary" value="Заказать" style="background:#00FA9A" />
+                            </form>
+                            }
+                        }
+                        else if (Accessor.HttpContext.Session.GetString("Role") == "client")
+                        {
+                            @if (item.Quantity == 0)
+                            {
+                                <input type="submit" disabled="disabled" class="btn btn-primary" style="background:gray" value="Нет на складе" />
+                            }
+                            else 
+                            {
+                                <form method="post" asp-page-handler="ClientOrder">
+                                    <input type="hidden" asp-for="SelectedShoeId" value="@item.ShoeId" />
+                                    <input type="submit" class="btn btn-primary" value="Заказать" style="background:#00FA9A" />
+                                </form> 
+                            }
+                        }                          
                 </div>
             </div>
         </div>
         </div>
     </div>
+}
+}
+else
+{
+<div class="alert alert-info">
+    <p>Нет товаров для отображения</p>
+</div>
 }

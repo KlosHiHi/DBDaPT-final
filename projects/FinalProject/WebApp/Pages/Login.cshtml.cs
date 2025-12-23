@@ -37,6 +37,7 @@ namespace WebApp.Pages
             HttpContext.Session.SetString("FirstName", user.FirstName);
             HttpContext.Session.SetString("SecondName", user.SecondName);
             HttpContext.Session.SetString("Patronymic", user.Patronymic);
+            HttpContext.Session.SetString("UserId", user.UserId.ToString());
             HttpContext.Session.SetString("Role", role.Name);
 
             return RedirectToPage("/Shoes/Index");
