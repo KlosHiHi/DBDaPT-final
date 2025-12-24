@@ -7,6 +7,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <LangVersion>preview</LangVersion>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShoeShopLibrary\ShoeShopLibrary.csproj" />
+  </ItemGroup>
 
 </Project>

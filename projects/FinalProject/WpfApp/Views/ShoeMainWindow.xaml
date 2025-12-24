@@ -1,0 +1,56 @@
+﻿<Window x:Class="WpfApp.Views.ShoeMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp.Views"
+        mc:Ignorable="d"
+        Title="ShoeMainWindow" Height="450" Width="1200" 
+        Background="AntiqueWhite" 
+        WindowStartupLocation="CenterScreen">
+    <DockPanel>
+        <DataGrid x:Name="ShoeDataGrid" AutoGenerateColumns="False" IsReadOnly="True" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Артикул" Binding="{Binding Article}" />
+                <DataGridTextColumn Header="Фото" Binding="{Binding Photo}"/>
+                <DataGridTextColumn Header="Категория" Binding="{Binding Category.Name}"/>
+                <DataGridTextColumn Header="Описание" Binding="{Binding Description}"/>
+                <DataGridTextColumn Header="Размер" Binding="{Binding Size}"/>
+                <DataGridTextColumn Header="Цвет" Binding="{Binding Color}"/>
+                <DataGridTextColumn Header="Производитель" Binding="{Binding Maker.Name}"/>
+                <DataGridTextColumn Header="Поставщик" Binding="{Binding Vendor.Name}"/>
+                <DataGridTemplateColumn Header="Цена" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="OldPrice" Text="{Binding Price}" Foreground="Red">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DiscountPercent}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock x:Name="Space" Text=" ">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Discount}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>
