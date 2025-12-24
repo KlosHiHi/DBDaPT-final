@@ -18,7 +18,7 @@ namespace WebApp.Pages
         public IActionResult OnGetLogout()
         {
             HttpContext.Session.Clear();
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Index"); // Завершение сессии
         }
 
         [BindProperty]
@@ -38,9 +38,9 @@ namespace WebApp.Pages
             HttpContext.Session.SetString("SecondName", user.SecondName);
             HttpContext.Session.SetString("Patronymic", user.Patronymic);
             HttpContext.Session.SetString("UserId", user.UserId.ToString());
-            HttpContext.Session.SetString("Role", role.Name);
+            HttpContext.Session.SetString("Role", role.Name); // Запись строк в сессию при авторизации
 
-            return RedirectToPage("/Shoes/Index");
+            return RedirectToPage("/Shoes/Index"); // Переадресация на страницу с товарами
         }
 
         public async Task<IActionResult> OnPostGuest()
@@ -49,7 +49,7 @@ namespace WebApp.Pages
 
             HttpContext.Session.SetString("Role", "guest");
 
-            return RedirectToPage("/Shoes/Index");
+            return RedirectToPage("/Shoes/Index"); // Вход в роли гостя
         }
     }
 }

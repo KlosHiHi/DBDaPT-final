@@ -29,7 +29,7 @@ namespace WebApp.Pages.Orders
 
             IEnumerable<Order?> orderInfos = await userOrders.ToListAsync();
 
-            OrderInfo = orderInfos.ToDtoInfos().ToList();
+            OrderInfo = orderInfos.ToDtoInfos().ToList(); 
         }
 
         public async Task OnGetManagerAsync()

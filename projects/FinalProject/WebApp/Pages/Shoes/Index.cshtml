@@ -10,6 +10,7 @@
     <div>
         <div class="row">
             <div class="col-10">
+                    <!-- Поле ввода для части описания -->
                     <font>Поиск по описанию</font> <input type="text"
                            name="shoeDescription"
                            value="@Model.ShoeDescription"
@@ -26,6 +27,7 @@
                         Все
                     </option>
                     </select>
+
                     <font>Максимальная цена</font> <input type="number"
                        name="maxPrice"
                        value="@Model.MaxPrice"
@@ -33,6 +35,7 @@
                        class="form-control" />
             </div>
 
+            <!-- Чек боксы для фильтрации -->
             <div class="col">
                 <div style="display:flex; align-items:center; justify-content: center;">
                     <font style="font-size:30px">Со скидкой</font> <input type="checkbox"
@@ -85,7 +88,8 @@
                 }
                 else
                 {
-                    <img src="~/img/@Html.DisplayFor(modelItem => item.PhotoName)" height="100" width="120" />
+                    <img src="~/img/@Html.DisplayFor(modelItem => item.PhotoName)" height="100" width="120" /> 
+                    //Получаем изображения и выводим их в зависимости от имени в БД
                 }
             </div>
             <div class="col">
@@ -108,7 +112,7 @@
                 
                 Количество на складе: @Html.DisplayFor(modelItem => item.Quantity)
             </div>                
-            <div class="col">
+            <div class="col"> <!-- отображение скидки на товар, если она больше 15 применять специальный цвет -->
                     <div class="card opacity-100" style="background:@(item.Discount < 15 ? "white" : "#00FA9A");width:50%;justify-content:center;align-items:center">
                         <p>скидка</p> <p style="font-size:50px;align-items:center">@Html.DisplayFor(modelItem => item.Discount)</p>
                     
@@ -129,13 +133,13 @@
                             @if (item.Quantity == 0)
                             {
                                 <input type="submit" disabled="disabled" class="btn btn-primary" style="background:gray" value="Нет на складе" />
-                            }
+                            } // Если товара нет, то кнопка блокируется 
                             else 
                             {
                                 <form method="post" asp-page-handler="ClientOrder">
                                     <input type="hidden" asp-for="SelectedShoeId" value="@item.ShoeId" />
-                                    <input type="submit" class="btn btn-primary" value="Заказать" style="background:#00FA9A" />
-                                </form> 
+                                    <input type="submit" class="btn btn-primary" value="Заказать" style="background:#00FA9A" /> 
+                                </form> //Отправка информации о товаре, который хочет заказать пользователь
                             }
                         }                          
                 </div>
@@ -146,7 +150,7 @@
 }
 }
 else
-{
+{ // Если нет товаров для отображения выводится сообщение об этом
 <div class="alert alert-info">
     <p>Нет товаров для отображения</p>
 </div>
